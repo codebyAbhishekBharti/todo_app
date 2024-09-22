@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_app/auth_services.dart';
 import 'package:todo_app/login.dart';
 import 'package:todo_app/signup.dart';
@@ -28,9 +29,11 @@ class _HomePageState extends State<HomePage> {
                 child: Text("This is Home Page", style: TextStyle(fontSize: 20)),
               ),
               SizedBox(height: 20),
-              ElevatedButton(onPressed: (){
+              ElevatedButton(onPressed: () async {
                 print("Button is pressed");
                 FirebaseAuth.instance.signOut();
+                var sharedPref = await SharedPreferences.getInstance();
+                sharedPref.setBool('login', false);
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => LoginPage()),

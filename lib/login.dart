@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_app/signup.dart';
 import 'auth_services.dart';
 import 'home_page.dart';
@@ -26,9 +27,12 @@ class _LoginPage extends State<LoginPage> {
     String email = emailText.text;
     String pass = passText.text;
 
+    var sharedPref = await SharedPreferences.getInstance();
+
     User? user = await _auth.signInWithEmailAndPassword(email, pass);
     if (user != null) {
       print("User is created");
+      sharedPref.setBool('login', true);
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
@@ -83,10 +87,6 @@ class _LoginPage extends State<LoginPage> {
                   print('Email: ${emailText.text}');
                   print('Password: ${passText.text}');
                   _signIn();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
-                  );
                 },
                 child: const Text('Login'),
               ),
