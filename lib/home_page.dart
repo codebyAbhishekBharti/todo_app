@@ -28,6 +28,10 @@ class _HomePageState extends State<HomePage> {
               Center(
                 child: Text("This is Home Page", style: TextStyle(fontSize: 20)),
               ),
+              Center(
+              //   show the current logged in user email
+                child: Text("Current User: ${FirebaseAuth.instance.currentUser!.email}", style: TextStyle(fontSize: 20)),
+              ),
               SizedBox(height: 20),
               ElevatedButton(onPressed: () async {
                 print("Button is pressed");
