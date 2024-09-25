@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_app/auth_services.dart';
 import 'package:todo_app/login.dart';
@@ -36,6 +37,7 @@ class _HomePageState extends State<HomePage> {
               ElevatedButton(onPressed: () async {
                 print("Button is pressed");
                 FirebaseAuth.instance.signOut();
+                await GoogleSignIn().signOut();
                 var sharedPref = await SharedPreferences.getInstance();
                 sharedPref.setBool('login', false);
                 Navigator.push(

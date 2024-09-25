@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_app/signup.dart';
 import 'auth_services.dart';
 import 'home_page.dart';
-
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,14 +15,16 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPage extends State<LoginPage> {
   final FirebaseAuthService _auth = FirebaseAuthService();
+  var emailText = TextEditingController();
+  var passText = TextEditingController();
+
   @override
   void dispose() {
     super.dispose();
     emailText.dispose();
     passText.dispose();
   }
-  var emailText = TextEditingController();
-  var passText = TextEditingController();
+
   void _signIn() async {
     String email = emailText.text;
     String pass = passText.text;
@@ -41,6 +43,34 @@ class _LoginPage extends State<LoginPage> {
       print("Some error happened");
     }
   }
+
+  signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+      final AuthCredential googleAuthCredential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(googleAuthCredential);
+      final User? user = userCredential.user;
+      print("User: $user");
+      var sharedPref = await SharedPreferences.getInstance();
+      if (user != null) {
+        print("User is created");
+        sharedPref.setBool('login', true);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      } else {
+        print("Some error happened");
+      }
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,16 +120,26 @@ class _LoginPage extends State<LoginPage> {
                 },
                 child: const Text('Login'),
               ),
-              ElevatedButton(onPressed: (){
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Signup_page()),
-                );
-              }, child: Text("SignUp"))
+              ElevatedButton(
+                onPressed: () {
+                  print("Google SignIn");
+                  signInWithGoogle();
+                },
+                child: Text("Google SignIn"),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Signup_page()),
+                  );
+                },
+                child: Text("SignUp"),
+              ),
             ],
           ),
         ),
-      )
+      ),
     );
   }
 }
