@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,7 +9,21 @@ import 'package:todo_app/home_page.dart'; // Add this import
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+      options: FirebaseOptions(
+          apiKey: "AIzaSyD_gPGdop-ECO1wpp4mkdcsmf6HZ4Va8lQ",
+          authDomain: "todo-with-sync.firebaseapp.com",
+          projectId: "todo-with-sync",
+          storageBucket: "todo-with-sync.appspot.com",
+          messagingSenderId: "122887292381",
+          appId: "1:122887292381:web:6bbcfe82d2982ff3c6e234",
+          measurementId: "G-D9JM1M2633"
+      ),
+    );
+  } else {
+    await Firebase.initializeApp();
+  }
   runApp(const MyApp());
 }
 
