@@ -26,6 +26,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           Column(
             children: [
+              Image.asset('assets/images/app_logo.png'),
               Center(
                 child: Text("This is Home Page", style: TextStyle(fontSize: 20)),
               ),
