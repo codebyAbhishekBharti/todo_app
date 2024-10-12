@@ -40,8 +40,8 @@ class _HomePageState extends State<HomePage> {
                     borderRadius: BorderRadius.circular(25),
                     child: Image.asset(
                       'assets/images/profile_image.png',
-                      width: 40,
-                      height: 40,
+                      width: 35,
+                      height: 35,
                     ),
                   ),
                   onPressed: () {
