@@ -63,15 +63,18 @@ class _HomePageState extends State<HomePage> {
           // mainAxisAlignment: MainAxisAlignment.center,
           children: [
                 Container(
-                  width: MediaQuery.of(context).size.width*0.8,
-                  // margin: EdgeInsets.only(bottom: 10),
+                  // width: MediaQuery.of(context).size.width*0.7,
+                  margin: EdgeInsets.only(top: 20),
+                  padding: EdgeInsets.only(left: 0, right: 20),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       // make star icon
-                      Icon(Icons.star, color: Colors.white , size: 25),
+                      Container(margin: EdgeInsets.only(left: 20, right: 20),child: Icon(Icons.star, color: Colors.white , size: 25)),
                       Container(
                         padding: EdgeInsets.only(bottom: 10),
+                        margin: EdgeInsets.only(left: 20, right: 20),
                         decoration: BoxDecoration(
                           border: Border(
                             bottom: BorderSide(width: 4.0, color: Color.fromARGB(255, 37, 150, 190),),
@@ -83,7 +86,7 @@ class _HomePageState extends State<HomePage> {
                                 fontSize: 15, fontWeight: FontWeight.bold)
                         ),
                       ),
-                      Text("+ New Task", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+                      Container(margin: EdgeInsets.only(left: 20, right: 20),child: Text("+ New Task", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold))),
                     ],
                   ),
                 ),
@@ -94,8 +97,15 @@ class _HomePageState extends State<HomePage> {
                 height: 1, // Height of the SizedBox
               ),
             ),
-            Container(width: double.infinity,child: Text("hello`", style: TextStyle(color: Colors.white),),
+            Container(
+                width: MediaQuery.of(context).size.width*0.9,
+                margin: EdgeInsets.only(top: 20),
+                padding: EdgeInsets.all(100),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.black,
                 ),
+            ),
           ],
         ),
       ),
