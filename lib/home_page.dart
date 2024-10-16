@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:todo_app/profile.dart';
 
+import 'new_list.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -86,42 +88,45 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               // Subtasks from the Firestore StreamBuilder
-                              StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                              StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                                 stream: FirebaseFirestore.instance
                                     .collection('users')
                                     .doc(userEmail)
-                                    .collection('tasks')
                                     .snapshots(),
                                 builder: (context, snapshot) {
                                   if (snapshot.connectionState == ConnectionState.waiting) {
                                     return Center(child: CircularProgressIndicator());
                                   }
 
-                                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                                    return Text(
-                                      '', // Empty text
-                                      style: TextStyle(color: Colors.white),
+                                  if (!snapshot.hasData || !snapshot.data!.exists) {
+                                    return Center(
+                                      child: Text(
+                                        '', //no tasks available
+                                        style: TextStyle(color: Colors.white),
+                                      ),
                                     );
                                   }
 
-                                  final taskDocs = snapshot.data!.docs;
-                                  List<dynamic> allSubtasks = [];
-
-                                  // Collect all subtasks from each task document
-                                  for (var doc in taskDocs) {
-                                    var subtasks = doc.data()['task_name'];
-                                    if (subtasks != null && subtasks is List<dynamic>) {
-                                      allSubtasks.addAll(subtasks);
-                                    }
+                                  // Access the task field which is an array of task names
+                                  final taskList = snapshot.data!.data()?['tasks'];
+                                  if (taskList == null || taskList.isEmpty) {
+                                    return Center(
+                                      child: Text(
+                                        '', //No tasks available.
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    );
                                   }
+
+                                  // Display tasks as a horizontal row
                                   return SingleChildScrollView(
                                     scrollDirection: Axis.horizontal,
                                     child: Row(
-                                      children: allSubtasks.map((subtask) {
+                                      children: taskList.map<Widget>((task) {
                                         return Padding(
                                           padding: EdgeInsets.only(left: 15, right: 15),
                                           child: Text(
-                                            subtask.toString(),
+                                            task.toString(),
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 14.0,
@@ -134,14 +139,25 @@ class _HomePageState extends State<HomePage> {
                                   );
                                 },
                               ),
-                              // "+ New List" text right after the subtasks
-                              Padding(
-                                padding: const EdgeInsets.only(left: 15.0),
-                                child: Text(
-                                  "+ New list",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14.0,
+                              GestureDetector(
+                                onTap: () {
+                                  // Handle tap
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => NewList()), // Navigate to ProfilePage
+                                  );
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 15.0),
+                                    child: Text(
+                                      "+ New list",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14.0,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),

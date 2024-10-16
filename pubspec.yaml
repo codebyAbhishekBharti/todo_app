@@ -38,8 +38,8 @@ dependencies:
   flutter_rating: ^2.0.2
   google_sign_in: ^6.2.1
   google_sign_in_web: ^0.12.4+2
-  cloud_firestore: ^5.4.2
-  #shared_preferences:
+  cloud_firestore: ^5.4.4
+  google_fonts: ^6.2.1
   shared_preferences: ^2.0.15
 
 
