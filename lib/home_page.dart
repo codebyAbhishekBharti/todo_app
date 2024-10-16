@@ -1,11 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:todo_app/auth_services.dart';
-import 'package:todo_app/login.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:todo_app/profile.dart';
-import 'package:todo_app/signup.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,6 +11,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final String userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,8 +44,8 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     print("Profile button is pressed");
                     Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ProfilePage()), // Navigate to ProfilePage
+                      context,
+                      MaterialPageRoute(builder: (context) => ProfilePage()), // Navigate to ProfilePage
                     );
                   },
                 ),
@@ -60,51 +57,109 @@ class _HomePageState extends State<HomePage> {
       body: Container(
         color: Color.fromARGB(255, 22, 25, 22),
         child: Column(
-          // mainAxisAlignment: MainAxisAlignment.center,
           children: [
-                Container(
-                  // width: MediaQuery.of(context).size.width*0.7,
-                  margin: EdgeInsets.only(top: 20),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Container(
                   padding: EdgeInsets.only(left: 0, right: 20),
                   child: Row(
-                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      // make star icon
-                      Container(margin: EdgeInsets.only(left: 20, right: 20),child: Icon(Icons.star, color: Colors.white , size: 25)),
-                      Container(
-                        padding: EdgeInsets.only(bottom: 10),
-                        margin: EdgeInsets.only(left: 20, right: 20),
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(width: 4.0, color: Color.fromARGB(255, 37, 150, 190),),
+                      Padding(
+                        padding: const EdgeInsets.only(top:5.0),
+                        child: Container(
+                          padding: EdgeInsets.only(left: 15, right: 15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(0.0),
+                                child: IconButton(
+                                  icon: Icon(Icons.star, color: Colors.white, size: 24),
+                                  onPressed: () {
+                                    // Handle button press
+                                    print("Star button pressed");
+                                    print(userEmail);
+                                  },
+                                ),
+                              ),
+                              // Subtasks from the Firestore StreamBuilder
+                              StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(userEmail)
+                                    .collection('tasks')
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return Center(child: CircularProgressIndicator());
+                                  }
+
+                                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                                    return Text(
+                                      '', // Empty text
+                                      style: TextStyle(color: Colors.white),
+                                    );
+                                  }
+
+                                  final taskDocs = snapshot.data!.docs;
+                                  List<dynamic> allSubtasks = [];
+
+                                  // Collect all subtasks from each task document
+                                  for (var doc in taskDocs) {
+                                    var subtasks = doc.data()['task_name'];
+                                    if (subtasks != null && subtasks is List<dynamic>) {
+                                      allSubtasks.addAll(subtasks);
+                                    }
+                                  }
+                                  return SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: allSubtasks.map((subtask) {
+                                        return Padding(
+                                          padding: EdgeInsets.only(left: 15, right: 15),
+                                          child: Text(
+                                            subtask.toString(),
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14.0,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              // "+ New List" text right after the subtasks
+                              Padding(
+                                padding: const EdgeInsets.only(left: 15.0),
+                                child: Text(
+                                  "+ New list",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        child: Text("My Tasks",
-                            style: TextStyle(
-                                color: Color.fromARGB(255, 37, 150, 190),
-                                fontSize: 15, fontWeight: FontWeight.bold)
-                        ),
                       ),
-                      Container(margin: EdgeInsets.only(left: 20, right: 20),child: Text("+ New Task", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold))),
                     ],
                   ),
                 ),
-            Container(
-              color: Colors.white, // Set the color of the SizedBox
-              child: SizedBox(
-                width: double.infinity,
-                height: 1, // Height of the SizedBox
               ),
             ),
             Container(
-                width: MediaQuery.of(context).size.width*0.9,
-                margin: EdgeInsets.only(top: 20),
-                padding: EdgeInsets.all(100),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.black,
-                ),
+              color: Colors.white,
+              child: SizedBox(
+                width: double.infinity,
+                height: 1,
+              ),
             ),
           ],
         ),
