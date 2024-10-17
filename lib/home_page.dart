@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
                                     print("Star button pressed");
                                     print(selectedTask);
                                     selectedTask="fav";
-                                    print(selectedTask);
+                                    print(selectedTask);  //added this line just to check if everything is working fine
                                   },
                                   child: Padding(
                                     padding: const EdgeInsets.only(bottom: 15.0),
