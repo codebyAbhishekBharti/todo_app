@@ -83,6 +83,8 @@ class _HomePageState extends State<HomePage> {
                                   onTap: () {
                                     print("Star button pressed");
                                     print(selectedTask);
+                                    selectedTask="fav";
+                                    print(selectedTask);
                                   },
                                   child: Padding(
                                     padding: const EdgeInsets.only(bottom: 15.0),
