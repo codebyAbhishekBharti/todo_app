@@ -83,7 +83,9 @@ class _HomePageState extends State<HomePage> {
                                   onTap: () {
                                     print("Star button pressed");
                                     print(selectedTask);
-                                    selectedTask="fav";
+                                    setState(() {
+                                      selectedTask="Starred";
+                                    });
                                     print(selectedTask);  //added this line just to check if everything is working fine
                                   },
                                   child: Padding(
@@ -329,10 +331,6 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => NewList()),
-          // );
           print("add task button is pressed");
         },
         backgroundColor: Colors.blue.withAlpha(100),
