@@ -18,4 +18,15 @@ class TaskHandler {
       return false;
     }
   }
+
+  void getTasks() async{
+    // Get the user document reference
+    final userDoc = await _firestore.collection('users').doc(userEmail).collection("My Tasks");
+    userDoc.get().then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        print(doc["title"]);
+        print(doc['description']);
+      });
+    });
+  }
 }
