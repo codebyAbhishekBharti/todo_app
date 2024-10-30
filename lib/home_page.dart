@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import 'package:todo_app/profile.dart';
 import 'new_list.dart';
 import 'package:todo_app/controller/task_handler.dart';
@@ -14,6 +15,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final String userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
   final taskHandler = TaskHandler();
+  bool description_field_enabler = false;
+  bool star_icon_enabler = false;
   String? selectedTask = "My Tasks"; // Variable to keep track of the selected task
 
   @override
@@ -211,7 +214,7 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.all(15.0),
                 child: Container(
                   width: double.infinity,
-                  height: MediaQuery.of(context).size.height - kToolbarHeight - 120,
+                  // height: MediaQuery.of(context).size.height - kToolbarHeight - 120,
                   decoration: BoxDecoration(
                     color: Colors.black87.withAlpha(180),
                     borderRadius: BorderRadius.circular(15),
@@ -344,27 +347,28 @@ class _HomePageState extends State<HomePage> {
                             );
                           }
 
-                          final tasks = snapshot.data!.docs;
-
-                          // Wrapping ListView.builder inside SingleChildScrollView
-                          return SingleChildScrollView(
-                            child: Column(
-                              children: tasks.map((task) {
-                                return ListTile(
-                                  title: Text(
-                                    task['title'],
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                          var tasks = snapshot.data!.docs;
+                          // can you create ListView.builder here for tasks
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: AlwaysScrollableScrollPhysics(), // Ensure it's scrollable
+                            itemCount: tasks.length,
+                            itemBuilder: (context, index) {
+                              final task = tasks[index].data() as Map<String, dynamic>;
+                              return ListTile(
+                                title: Text(
+                                  task['title'],
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  subtitle: Text(
-                                    task['description'],
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
+                                ),
+                                subtitle: Text(
+                                  task['description'],
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              );
+                            },
                           );
                         },
                       ),
@@ -377,13 +381,158 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          print("add task button is pressed");
-          try {
+        onPressed: () {
+          TextEditingController ttitle = TextEditingController();
+          TextEditingController description = TextEditingController();
+          TextEditingController date = TextEditingController();
+          date.text = "2000-01-01 00:00:00";
+          bool favoriate = false;
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true, // To allow the sheet to resize with the keyboard
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(15),
+              ),
+            ),
+            backgroundColor: Colors.grey[900],
+            builder: (BuildContext context) {
+              return StatefulBuilder(
+                builder: (BuildContext context, StateSetter setModalState) {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      left: 15.0,
+                      right: 15.0,
+                      top: 15.0,
+                      // Adjust bottom padding for the keyboard
+                      bottom: MediaQuery.of(context).viewInsets.bottom + 15.0,
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min, // Set size to minimum required
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextField(
+                            controller: ttitle,
+                            decoration: InputDecoration(
+                              hintText: 'New task',
+                              hintStyle: TextStyle(color: Colors.white.withAlpha(150)),
+                              border: InputBorder.none, // Remove the border
+                            ),
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400), // Set text color to white
+                          ),
+                          if (description_field_enabler)
+                            Container(
+                              height: 25,
+                              child: TextField(
+                                controller: description,
+                                decoration: InputDecoration(
+                                  hintText: 'Add Details',
+                                  hintStyle: TextStyle(color: Colors.white.withAlpha(150)),
+                                  border: InputBorder.none, // Remove the border
+                                ),
+                                style: TextStyle(color: Colors.white, fontSize: 14), // Set text color to white
+                              ),
+                            ),
+                          SizedBox(height: 10),
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  setModalState(() {
+                                    description_field_enabler = !description_field_enabler;
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 20),
+                                  child: Icon(Icons.menu, color: Colors.white.withAlpha(200)),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () async {
+                                  DateTime? pickedDate = await showDatePicker(
+                                    context: context,
+                                    initialDate: DateTime.now(),
+                                    firstDate: DateTime.now(),
+                                    lastDate: DateTime(2099),
+                                    builder: (BuildContext context, Widget? child) {
+                                      return Theme(
+                                        data: ThemeData.dark().copyWith(
+                                          colorScheme: ColorScheme.dark(
+                                            primary: Colors.blue,
+                                            onPrimary: Colors.white,
+                                            surface: Colors.grey.shade900,
+                                            onSurface: Colors.white,
+                                          ),
+                                          dialogBackgroundColor: Colors.grey[900]!.withAlpha(180),
+                                        ),
+                                        child: child!,
+                                      );
+                                    },
+                                  );
 
-          } catch (e) {
-            print('Error fetching data: $e');
-          }
+                                  if (pickedDate != null) {
+                                      final DateTime finalDateTime = DateTime(
+                                        pickedDate.year,
+                                        pickedDate.month,
+                                        pickedDate.day,
+                                      );
+                                      setModalState(() {
+                                        date.text = DateFormat('yyyy-MM-dd HH:mm:ss').format(finalDateTime);
+                                      });
+                                  }
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 20),
+                                  child: Icon(Icons.watch_later_outlined, color: Colors.white.withAlpha(200)),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: (){
+                                  favoriate = !favoriate;
+                                  setModalState(() {
+                                    star_icon_enabler = !star_icon_enabler;
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 20),
+                                  child: Icon((star_icon_enabler)?Icons.star:Icons.star_border_outlined, color: Colors.white.withAlpha(200)),
+                                ),
+                              ),
+                              Spacer(), // This will push the following Done to the right
+                              GestureDetector(
+                                onTap: () async{
+                                  print(ttitle.text);
+                                  print(description.text);
+                                  print(favoriate);
+                                  print(date.text);
+                                  bool task_added = await taskHandler.add_task(selectedTask ?? 'My Tasks', ttitle.text, description.text, favoriate, date.text);
+                                  if(task_added==true){
+                                    setModalState(() {
+                                      star_icon_enabler = false;
+                                      description_field_enabler = false;
+                                    });
+                                    Navigator.pop(context);
+                                  }
+                                  else{
+                                    print("Error adding task");
+                                  }
+                                },
+                                child: Text(
+                                  "Save",
+                                  style: TextStyle(color: Colors.white.withAlpha(100), fontSize: 16),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          );
         },
         backgroundColor: Colors.blue.withAlpha(100),
         child: Icon(
