@@ -203,179 +203,187 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-              Container(
-                color: Colors.white,
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 1,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Container(
-                  width: double.infinity,
-                  // height: MediaQuery.of(context).size.height - kToolbarHeight - 120,
-                  decoration: BoxDecoration(
-                    color: Colors.black87.withAlpha(180),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Row(
-                            children: [
-                              Text(
-                                selectedTask ?? 'No task selected',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              Spacer(), // This will push the following icons to the right
-                              Icon(
-                                Icons.swap_vert,
-                                color: Colors.white,
-                              ),
-                              SizedBox(width: 10), // Optional spacing between icons
-                              IconButton(
-                                icon: Icon(
-                                  Icons.more_vert,
-                                  color: Colors.white,
-                                ),
-                                onPressed: () {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(
-                                        top: Radius.circular(15),
-                                      ),
-                                    ),
-                                    backgroundColor: Colors.grey[900]!.withAlpha(180),
-                                    builder: (BuildContext context) {
-                                      return Padding(
-                                        padding: const EdgeInsets.all(15.0),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min, // Set the size to the minimum needed
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            ListTile(
-                                              title: Text(
-                                                'Rename list',
-                                                style: TextStyle(color: Colors.white),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black87.withAlpha(180),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                children: [
+                                  Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          selectedTask ?? 'No task selected',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        Spacer(), // This will push the following icons to the right
+                                        Icon(
+                                          Icons.swap_vert,
+                                          color: Colors.white,
+                                        ),
+                                        SizedBox(width: 10), // Optional spacing between icons
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.more_vert,
+                                            color: Colors.white,
+                                          ),
+                                          onPressed: () {
+                                            showModalBottomSheet(
+                                              context: context,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.vertical(
+                                                  top: Radius.circular(15),
+                                                ),
                                               ),
-                                              onTap: () {
-                                                // Handle rename list action
-                                                Navigator.pop(context); // Close the bottom sheet
-                                              },
-                                            ),
-                                            ListTile(
-                                              title: Text(
-                                                'Delete list',
-                                                style: (selectedTask=="My Tasks")?TextStyle(color: Colors.white.withAlpha(100)):TextStyle(color: Colors.white),
-                                              ),
-                                              // add description
-                                              subtitle: (selectedTask=="My Tasks")?Text(
-                                                "Default list can't be deleted",
-                                                style: (selectedTask=="My Tasks")?TextStyle(color: Colors.white.withAlpha(100),fontSize: 12):TextStyle(color: Colors.white,fontSize: 12),
-                                              ):null,
-                                              onTap: () async {
-                                                // Handle delete list action
-                                                if (selectedTask != "My Tasks") {
-                                                  if(await taskHandler.deleteTask(selectedTask)){
-                                                    setState(() {
-                                                      selectedTask="My Tasks";
-                                                    });
-                                                    Navigator.pop(context);
-                                                    print("Task deleted successfully main");
-
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      SnackBar(
-                                                        content: Text('Task deleted successfully'),
-                                                        duration: Duration(seconds: 2),
-                                                        behavior: SnackBarBehavior.floating,
-                                                        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                                              backgroundColor: Colors.grey[900]!.withAlpha(180),
+                                              builder: (BuildContext context) {
+                                                return Padding(
+                                                  padding: const EdgeInsets.all(15.0),
+                                                  child: Column(
+                                                    mainAxisSize: MainAxisSize.min, // Set the size to the minimum needed
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      ListTile(
+                                                        title: Text(
+                                                          'Rename list',
+                                                          style: TextStyle(color: Colors.white),
+                                                        ),
+                                                        onTap: () {
+                                                          // Handle rename list action
+                                                          Navigator.pop(context); // Close the bottom sheet
+                                                        },
                                                       ),
-                                                    );
-                                                  }
-                                                  else{
-                                                    print("Task deletion failed");
-                                                  }
-                                                }
+                                                      ListTile(
+                                                        title: Text(
+                                                          'Delete list',
+                                                          style: (selectedTask=="My Tasks")?TextStyle(color: Colors.white.withAlpha(100)):TextStyle(color: Colors.white),
+                                                        ),
+                                                        // add description
+                                                        subtitle: (selectedTask=="My Tasks")?Text(
+                                                          "Default list can't be deleted",
+                                                          style: (selectedTask=="My Tasks")?TextStyle(color: Colors.white.withAlpha(100),fontSize: 12):TextStyle(color: Colors.white,fontSize: 12),
+                                                        ):null,
+                                                        onTap: () async {
+                                                          // Handle delete list action
+                                                          if (selectedTask != "My Tasks") {
+                                                            if(await taskHandler.deleteTask(selectedTask)){
+                                                              setState(() {
+                                                                selectedTask="My Tasks";
+                                                              });
+                                                              Navigator.pop(context);
+                                                              print("Task deleted successfully main");
+
+                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                SnackBar(
+                                                                  content: Text('Task deleted successfully'),
+                                                                  duration: Duration(seconds: 2),
+                                                                  behavior: SnackBarBehavior.floating,
+                                                                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                                                                ),
+                                                              );
+                                                            }
+                                                            else{
+                                                              print("Task deletion failed");
+                                                            }
+                                                          }
+                                                        },
+                                                      ),
+                                                      ListTile(
+                                                        title: Text(
+                                                          'Delete all completed tasks',
+                                                          style: TextStyle(color: Colors.white),
+                                                        ),
+                                                        onTap: () {
+                                                          // Handle delete completed tasks action
+                                                          Navigator.pop(context); // Close the bottom sheet
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
                                               },
-                                            ),
-                                            ListTile(
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  StreamBuilder<QuerySnapshot>(
+                                    stream: FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(userEmail)
+                                        .collection(selectedTask ?? 'My Tasks')
+                                        .snapshots(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        return Center(child: CircularProgressIndicator());
+                                      }
+
+                                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                                        return Center(
+                                          child: Text(
+                                            'No tasks available',
+                                            style: TextStyle(color: Colors.white),
+                                          ),
+                                        );
+                                      }
+
+                                      final tasks = snapshot.data!.docs;
+
+                                      // Wrapping ListView.builder inside SingleChildScrollView
+                                      return SingleChildScrollView(
+                                        child: Column(
+                                          children: tasks.map((task) {
+                                            return ListTile(
                                               title: Text(
-                                                'Delete all completed tasks',
-                                                style: TextStyle(color: Colors.white),
+                                                task['title'],
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
-                                              onTap: () {
-                                                // Handle delete completed tasks action
-                                                Navigator.pop(context); // Close the bottom sheet
-                                              },
-                                            ),
-                                          ],
+                                              subtitle: Text(
+                                                task['description'],
+                                                style: TextStyle(color: Colors.grey),
+                                              ),
+                                            );
+                                          }).toList(),
                                         ),
                                       );
                                     },
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      StreamBuilder<QuerySnapshot>(
-                        stream: FirebaseFirestore.instance
-                            .collection('users')
-                            .doc(userEmail)
-                            .collection(selectedTask ?? 'My Tasks')
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          }
-
-                          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                            return Center(
-                              child: Text(
-                                'No tasks available',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            );
-                          }
-
-                          var tasks = snapshot.data!.docs;
-                          // can you create ListView.builder here for tasks
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            physics: AlwaysScrollableScrollPhysics(), // Ensure it's scrollable
-                            itemCount: tasks.length,
-                            itemBuilder: (context, index) {
-                              final task = tasks[index].data() as Map<String, dynamic>;
-                              return ListTile(
-                                title: Text(
-                                  task['title'],
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
                                   ),
-                                ),
-                                subtitle: Text(
-                                  task['description'],
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ],
+                                ],
+                              ),
+                            )
+                        ),
+                        Container(
+                          width: double.infinity,
+                          height: 800,
+                          color: Colors.red,
+                        ),
+                        Container(
+                          width: double.infinity,
+                          height: 800,
+                          color: Colors.orange,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),
