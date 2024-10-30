@@ -342,42 +342,45 @@ class _HomePageState extends State<HomePage> {
                                       }
 
                                       final tasks = snapshot.data!.docs;
-
-                                      // Wrapping ListView.builder inside SingleChildScrollView
-                                      return SingleChildScrollView(
-                                        child: Column(
-                                          children: tasks.map((task) {
-                                            return ListTile(
-                                              title: Text(
-                                                task['title'],
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
+                                      return Column(
+                                        children: tasks.map((task) {
+                                          return ListTile(
+                                            title: Text(
+                                              task['title'],
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
                                               ),
-                                              subtitle: Text(
-                                                task['description'],
-                                                style: TextStyle(color: Colors.grey),
-                                              ),
-                                            );
-                                          }).toList(),
-                                        ),
+                                            ),
+                                            subtitle: Text(
+                                              task['description'],
+                                              style: TextStyle(color: Colors.grey),
+                                            ),
+                                            trailing: IconButton(
+                                              onPressed: () async {
+                                                // Delete the specific task from Firebase
+                                                await FirebaseFirestore.instance
+                                                    .collection('users')
+                                                    .doc(userEmail)
+                                                    .collection(selectedTask ?? 'My Tasks')
+                                                    .doc(task.id) // Use the document ID to reference the task
+                                                    .delete()
+                                                    .then((_) {
+                                                  print("Task successfully deleted!");
+                                                }).catchError((error) {
+                                                  print("Failed to delete task: $error");
+                                                });
+                                              },
+                                                icon: Icon(Icons.delete, color: Colors.white.withAlpha(100)),
+                                            ),
+                                          );
+                                        }).toList(),
                                       );
                                     },
                                   ),
                                 ],
                               ),
                             )
-                        ),
-                        Container(
-                          width: double.infinity,
-                          height: 800,
-                          color: Colors.red,
-                        ),
-                        Container(
-                          width: double.infinity,
-                          height: 800,
-                          color: Colors.orange,
                         ),
                       ],
                     ),
