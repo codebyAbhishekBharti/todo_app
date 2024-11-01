@@ -807,14 +807,21 @@ class _HomePageState extends State<HomePage> {
                                 children: [
                                   Row(
                                     children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(20.0),
-                                        child: Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Text(
-                                            'Completed (${tasks.length})',
-                                            style: GoogleFonts.afacad(
-                                              textStyle: TextStyle(color: Colors.white, fontSize: 20.0),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            showCompletedTasks = !showCompletedTasks;
+                                          });
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(20.0),
+                                          child: Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              'Completed (${tasks.length})',
+                                              style: GoogleFonts.afacad(
+                                                textStyle: TextStyle(color: Colors.white, fontSize: 20.0),
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -824,9 +831,9 @@ class _HomePageState extends State<HomePage> {
                                         padding: const EdgeInsets.only(right: 25.0),
                                         child: IconButton(
                                           onPressed: () {
-                                            setState(() {
-                                              showCompletedTasks = !showCompletedTasks;
-                                            });
+                                            // setState(() {
+                                            //   showCompletedTasks = !showCompletedTasks;
+                                            // });
                                           },
                                           icon: Icon(
                                             showCompletedTasks
