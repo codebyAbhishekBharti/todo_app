@@ -330,7 +330,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                 ),
-                                // no task found
+                                // if no task found or all are completed
                                 Container(
                                   child: StreamBuilder<QuerySnapshot>(
                                     stream: FirebaseFirestore.instance
@@ -345,34 +345,72 @@ class _HomePageState extends State<HomePage> {
 
                                       if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                                         return Padding(
-                                          padding: const EdgeInsets.only(top: 8.0,left: 50,right: 50,bottom: 50),
+                                          padding: const EdgeInsets.only(top: 8.0, left: 50, right: 50, bottom: 50),
                                           child: Column(
                                             children: [
-                                              // Image.asset('assets/images/empty-tasks-light.svg'),
-                                              // Image.asset('assets/images/app_logo.png'),
                                               SvgPicture.asset(
                                                 'assets/images/empty-tasks-light.svg',
-                                                width: 250.0,       // Set the width as needed
-                                                height: 250.0,      // Set the height as needed
-                                                fit: BoxFit.cover,  // Control how it fits
+                                                width: 250.0,
+                                                height: 250.0,
+                                                fit: BoxFit.cover,
                                               ),
-                                              Center(child: Text("No tasks yet", style: TextStyle(fontSize: 20,color: Colors.white.withAlpha(180)))),
                                               Center(
-                                                  child: Text(
-                                                    "Add your to-dos and keep\n track of them across Google \nWorkspace",
-                                                    style: TextStyle(fontSize:16,color: Colors.white.withAlpha(180)),
-                                                    textAlign: TextAlign.center,
-                                                    )
+                                                child: Text(
+                                                  "No tasks yet",
+                                                  style: TextStyle(fontSize: 20, color: Colors.white.withAlpha(180)),
+                                                ),
+                                              ),
+                                              Center(
+                                                child: Text(
+                                                  "Add your to-dos and keep\n track of them across Google \nWorkspace",
+                                                  style: TextStyle(fontSize: 16, color: Colors.white.withAlpha(180)),
+                                                  textAlign: TextAlign.center,
+                                                ),
                                               ),
                                             ],
                                           ),
                                         );
                                       }
-                                      return Text("");
+
+                                      // Check if all tasks have status = 1
+                                      final tasks = snapshot.data!.docs;
+                                      bool allTasksCompleted = tasks.every((task) => task['status'] == 1);
+
+                                      if (allTasksCompleted) {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(top: 8.0, left: 50, right: 50, bottom: 50),
+                                          child: Column(
+                                            children: [
+                                              SvgPicture.asset(
+                                                'assets/images/all-tasks-completed-light.svg',
+                                                width: 250.0,
+                                                height: 250.0,
+                                                fit: BoxFit.cover,
+                                              ),
+                                              Center(
+                                                child: Text(
+                                                  "All tasks completed!",
+                                                  style: TextStyle(fontSize: 20, color: Colors.white.withAlpha(180)),
+                                                ),
+                                              ),
+                                              Center(
+                                                child: Text(
+                                                  "Nice Work!",
+                                                  style: TextStyle(fontSize: 16, color: Colors.white.withAlpha(180)),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }
+
+                                      // If there are tasks but not all are completed, show tasks normally (implement your task list UI here)
+                                      return SizedBox.shrink();
                                     },
                                   ),
                                 ),
-                                // past container
+                                 // past container
                                 Container(
                                   child: StreamBuilder<QuerySnapshot>(
                                     stream: FirebaseFirestore.instance
