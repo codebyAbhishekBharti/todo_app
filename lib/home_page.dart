@@ -155,7 +155,7 @@ class _HomePageState extends State<HomePage> {
                                                       task.toString(),
                                                       style: TextStyle(
                                                         color: selectedTask == task
-                                                            ? Colors.blue
+                                                            ? Colors.blue.shade300
                                                             : Colors.white,
                                                         fontSize: 14.0,
                                                         fontWeight: FontWeight.w500,
