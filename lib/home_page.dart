@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_app/profile.dart';
+import 'Widgets/task_tile_viewer.dart';
 import 'new_list.dart';
 import 'package:todo_app/controller/task_handler.dart';
 class HomePage extends StatefulWidget {
@@ -418,189 +419,40 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                                  // past container
-                                Container(
-                                  child: StreamBuilder<QuerySnapshot>(
-                                    stream: FirebaseFirestore.instance
-                                        .collection('users')
-                                        .doc(userEmail)
-                                        .collection(selectedTask ?? 'My Tasks')
-                                        .where('status',isEqualTo: 0)
-                                        .where('task_date', isLessThanOrEqualTo: Timestamp.fromDate(DateTime.now().subtract(Duration(hours: 24))), // Start of today
-                                        isLessThan: Timestamp.fromDate(DateTime.now().add(Duration(days: 1)))) // End of today
-                                        .where('task_date', isNotEqualTo: Timestamp.fromDate(specificDateTime))
-                                        .snapshots(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                        // return Center(child: CircularProgressIndicator());
-                                        print("Waiting for data...");
-                                      }
-
-                                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                                        // Return an empty container if no tasks for today
-                                        return SizedBox.shrink(); // This is an empty widget
-                                      }
-
-                                      final tasks = snapshot.data!.docs;
-                                      return Column(
-                                        children: [
-                                          // Only show this Padding if there are tasks
-                                          Padding(
-                                            padding: const EdgeInsets.only(left: 30.0),
-                                            child: Align(
-                                              alignment: Alignment.topLeft,
-                                              child: Text("Past", style: TextStyle(color: Colors.pink.shade200)),
-                                            ),
-                                          ),
-                                          // Now you can display the tasks since we know there are some
-                                          Column(
-                                            children: tasks.map((task) {
-                                              return ListTile(
-                                                leading: IconButton(
-                                                  onPressed: () {
-                                                    // Toggle status of the task
-                                                    int newStatus = task['status'] == 0 ? 1 : 0;
-                                                    FirebaseFirestore.instance
-                                                        .collection('users')
-                                                        .doc(userEmail)
-                                                        .collection(selectedTask ?? 'My Tasks')
-                                                        .doc(task.id)
-                                                        .update({'status': newStatus}).then((_) {
-                                                      print("Task status updated successfully!");
-                                                    }).catchError((error) {
-                                                      print("Failed to update task status: $error");
-                                                    });
-                                                  },
-                                                  icon: Icon(
-                                                    task['status'] == 1 ? Icons.check_circle : Icons.circle_outlined,
-                                                    color: task['status'] == 1 ? Colors.green : Colors.white,
-                                                  ),
-                                                ),
-                                                title: Text(
-                                                  task['title'],
-                                                  style: TextStyle(color: Colors.white),
-                                                ),
-                                                subtitle: Text(
-                                                  task['description'],
-                                                  style: TextStyle(color: Colors.grey),
-                                                ),
-                                                trailing: IconButton(
-                                                  onPressed: () async {
-                                                    // Delete the specific task from Firebase
-                                                    await FirebaseFirestore.instance
-                                                        .collection('users')
-                                                        .doc(userEmail)
-                                                        .collection(selectedTask ?? 'My Tasks')
-                                                        .doc(task.id)
-                                                        .delete()
-                                                        .then((_) {
-                                                      print("Task successfully deleted!");
-                                                    }).catchError((error) {
-                                                      print("Failed to delete task: $error");
-                                                    });
-                                                  },
-                                                  icon: Icon(Icons.delete, color: Colors.white.withAlpha(100)),
-                                                ),
-                                              );
-                                            }).toList(),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
+                                taskContainer(
+                                  label: "Past",
+                                  labelColor: Colors.pink.shade200,
+                                  userEmail: userEmail,
+                                  selectedTask: selectedTask,
+                                  stream: FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(userEmail)
+                                      .collection(selectedTask ?? 'My Tasks')
+                                      .where('status', isEqualTo: 0)
+                                      .where('task_date', isLessThanOrEqualTo: Timestamp.fromDate(DateTime.now().subtract(Duration(hours: 24))))
+                                      .snapshots(),
                                 ),
                                 // today container
-                                Container(
-                                  child: StreamBuilder<QuerySnapshot>(
-                                    stream: FirebaseFirestore.instance
-                                        .collection('users')
-                                        .doc(userEmail)
-                                        .collection(selectedTask ?? 'My Tasks')
-                                        .where('task_date', isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime.now().subtract(Duration(hours: 24))), // Start of today
-                                        isLessThan: Timestamp.fromDate(DateTime.now().add(Duration(days: 1)))) // End of today
-                                        .where('status',isEqualTo: 0)
-                                        .snapshots(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                        // return Center(child: CircularProgressIndicator());
-                                        print("Waiting for data...");
-                                      }
-
-                                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                                        // Return an empty container if no tasks for today
-                                        return SizedBox.shrink(); // This is an empty widget
-                                      }
-
-                                      final tasks = snapshot.data!.docs;
-                                      return Column(
-                                        children: [
-                                          // Only show this Padding if there are tasks
-                                          Padding(
-                                            padding: const EdgeInsets.only(left: 30.0),
-                                            child: Align(
-                                              alignment: Alignment.topLeft,
-                                              child: Text("Today", style: TextStyle(color: Colors.blue.shade300)),
-                                            ),
-                                          ),
-                                          // Now you can display the tasks since we know there are some
-                                          Column(
-                                            children: tasks.map((task) {
-                                              return ListTile(
-                                                leading: IconButton(
-                                                  onPressed: () {
-                                                    // Toggle status of the task
-                                                    int newStatus = task['status'] == 0 ? 1 : 0;
-                                                    FirebaseFirestore.instance
-                                                        .collection('users')
-                                                        .doc(userEmail)
-                                                        .collection(selectedTask ?? 'My Tasks')
-                                                        .doc(task.id)
-                                                        .update({'status': newStatus}).then((_) {
-                                                      print("Task status updated successfully!");
-                                                    }).catchError((error) {
-                                                      print("Failed to update task status: $error");
-                                                    });
-                                                  },
-                                                  icon: Icon(
-                                                    task['status'] == 1 ? Icons.check_circle : Icons.circle_outlined,
-                                                    color: task['status'] == 1 ? Colors.green : Colors.white,
-                                                  ),
-                                                ),
-                                                title: Text(
-                                                  task['title'],
-                                                  style: TextStyle(color: Colors.white),
-                                                ),
-                                                subtitle: Text(
-                                                  task['description'],
-                                                  style: TextStyle(color: Colors.grey),
-                                                ),
-                                                trailing: IconButton(
-                                                  onPressed: () async {
-                                                    // Delete the specific task from Firebase
-                                                    await FirebaseFirestore.instance
-                                                        .collection('users')
-                                                        .doc(userEmail)
-                                                        .collection(selectedTask ?? 'My Tasks')
-                                                        .doc(task.id)
-                                                        .delete()
-                                                        .then((_) {
-                                                      print("Task successfully deleted!");
-                                                    }).catchError((error) {
-                                                      print("Failed to delete task: $error");
-                                                    });
-                                                  },
-                                                  icon: Icon(Icons.delete, color: Colors.white.withAlpha(100)),
-                                                ),
-                                              );
-                                            }).toList(),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
+                                taskContainer(
+                                  label: "Today",
+                                  labelColor: Colors.blue.shade300,
+                                  userEmail: userEmail,
+                                  selectedTask: selectedTask,
+                                  stream: FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(userEmail)
+                                      .collection(selectedTask ?? 'My Tasks')
+                                      .where('task_date', isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime.now().subtract(Duration(hours: 24))), // Start of today
+                                      isLessThan: Timestamp.fromDate(DateTime.now().add(Duration(days: 1)))) // End of today
+                                      .where('status',isEqualTo: 0)
+                                      .snapshots(),
                                 ),
                                 // future container
-                                Container(
-                                  child: StreamBuilder<QuerySnapshot>(
+                                taskContainer(
+                                  label: "",
+                                  labelColor: Colors.white,
+                                  userEmail: userEmail,
+                                  selectedTask: selectedTask,
                                     stream: FirebaseFirestore.instance
                                         .collection('users')
                                         .doc(userEmail)
@@ -608,176 +460,21 @@ class _HomePageState extends State<HomePage> {
                                         .where('task_date', isGreaterThan: Timestamp.fromDate(DateTime.now().add(Duration(days: 1)))) // End of today
                                         .where('status', isEqualTo: 0)
                                         .snapshots(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                        // return Center(child: CircularProgressIndicator());
-                                        print("Waiting for data...");
-                                      }
-
-                                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                                        return SizedBox.shrink(); // This is an empty widget
-                                      }
-
-                                      final tasks = snapshot.data!.docs;
-                                      return Column(
-                                        children: tasks.map((task) {
-                                          // Convert the Timestamp to DateTime
-                                          DateTime dateTime = (task['task_date'] as Timestamp).toDate();
-
-                                          // Format the DateTime as "Wed, 6 Nov"
-                                          String formattedDate = DateFormat('EEE, d MMM').format(dateTime);
-
-                                          return Column(
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(left: 30.0),
-                                                child: Align(
-                                                  alignment: Alignment.topLeft,
-                                                  child: Text(
-                                                    formattedDate, // Display the formatted date
-                                                    style: TextStyle(color: Colors.white),
-                                                  ),
-                                                ),
-                                              ),
-                                              ListTile(
-                                                leading: IconButton(
-                                                  onPressed: () {
-                                                    int newStatus = task['status'] == 0 ? 1 : 0;
-                                                    FirebaseFirestore.instance
-                                                        .collection('users')
-                                                        .doc(userEmail)
-                                                        .collection(selectedTask ?? 'My Tasks')
-                                                        .doc(task.id)
-                                                        .update({'status': newStatus}).then((_) {
-                                                      print("Task status updated successfully!");
-                                                    }).catchError((error) {
-                                                      print("Failed to update task status: $error");
-                                                    });
-                                                  },
-                                                  icon: Icon(
-                                                    task['status'] == 1 ? Icons.check_circle : Icons.circle_outlined,
-                                                    color: task['status'] == 1 ? Colors.green : Colors.white,
-                                                  ),
-                                                ),
-                                                title: Text(
-                                                  task['title'],
-                                                  style: TextStyle(color: Colors.white),
-                                                ),
-                                                subtitle: Text(
-                                                  task['description'],
-                                                  style: TextStyle(color: Colors.grey),
-                                                ),
-                                                trailing: IconButton(
-                                                  onPressed: () async {
-                                                    await FirebaseFirestore.instance
-                                                        .collection('users')
-                                                        .doc(userEmail)
-                                                        .collection(selectedTask ?? 'My Tasks')
-                                                        .doc(task.id)
-                                                        .delete()
-                                                        .then((_) {
-                                                      print("Task successfully deleted!");
-                                                    }).catchError((error) {
-                                                      print("Failed to delete task: $error");
-                                                    });
-                                                  },
-                                                  icon: Icon(Icons.delete, color: Colors.white.withAlpha(100)),
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        }).toList(),
-                                      );
-                                    },
-                                  ),
+                                  showDateHeader: true
                                 ),
                                 // no date container
-                                Container(
-                                  child: StreamBuilder<QuerySnapshot>(
-                                    stream: FirebaseFirestore.instance
-                                        .collection('users')
-                                        .doc(userEmail)
-                                        .collection(selectedTask ?? 'My Tasks')
-                                        .where('task_date', isEqualTo: Timestamp.fromDate(specificDateTime))
-                                        .where('status',isEqualTo: 0)
-                                        .snapshots(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return Center(child: CircularProgressIndicator());
-                                      }
-
-                                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                                        // Return an empty container if no tasks for today
-                                        return SizedBox.shrink(); // This is an empty widget
-                                      }
-
-                                      final tasks = snapshot.data!.docs;
-                                      return Column(
-                                        children: [
-                                          // Only show this Padding if there are tasks
-                                          Padding(
-                                            padding: const EdgeInsets.only(left: 30.0),
-                                            child: Align(
-                                              alignment: Alignment.topLeft,
-                                              child: Text("No date", style: TextStyle(color: Colors.white)),
-                                            ),
-                                          ),
-                                          // Now you can display the tasks since we know there are some
-                                          Column(
-                                            children: tasks.map((task) {
-                                              return ListTile(
-                                                leading: IconButton(
-                                                  onPressed: () {
-                                                    // Toggle status of the task
-                                                    int newStatus = task['status'] == 0 ? 1 : 0;
-                                                    FirebaseFirestore.instance
-                                                        .collection('users')
-                                                        .doc(userEmail)
-                                                        .collection(selectedTask ?? 'My Tasks')
-                                                        .doc(task.id)
-                                                        .update({'status': newStatus}).then((_) {
-                                                      print("Task status updated successfully!");
-                                                    }).catchError((error) {
-                                                      print("Failed to update task status: $error");
-                                                    });
-                                                  },
-                                                  icon: Icon(
-                                                    task['status'] == 1 ? Icons.check_circle : Icons.circle_outlined,
-                                                    color: task['status'] == 1 ? Colors.green : Colors.white,
-                                                  ),
-                                                ),
-                                                title: Text(
-                                                  task['title'],
-                                                  style: TextStyle(color: Colors.white),
-                                                ),
-                                                subtitle: Text(
-                                                  task['description'],
-                                                  style: TextStyle(color: Colors.grey),
-                                                ),
-                                                trailing: IconButton(
-                                                  onPressed: () async {
-                                                    // Delete the specific task from Firebase
-                                                    await FirebaseFirestore.instance
-                                                        .collection('users')
-                                                        .doc(userEmail)
-                                                        .collection(selectedTask ?? 'My Tasks')
-                                                        .doc(task.id)
-                                                        .delete()
-                                                        .then((_) {
-                                                      print("Task successfully deleted!");
-                                                    }).catchError((error) {
-                                                      print("Failed to delete task: $error");
-                                                    });
-                                                  },
-                                                  icon: Icon(Icons.delete, color: Colors.white.withAlpha(100)),
-                                                ),
-                                              );
-                                            }).toList(),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
+                                taskContainer(
+                                  label: "No date",
+                                  labelColor: Colors.white,
+                                  userEmail: userEmail,
+                                  selectedTask: selectedTask,
+                                  stream: FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(userEmail)
+                                      .collection(selectedTask ?? 'My Tasks')
+                                      .where('task_date', isEqualTo: Timestamp.fromDate(specificDateTime))
+                                      .where('status',isEqualTo: 0)
+                                      .snapshots(),
                                 ),
                               ],
                             )
