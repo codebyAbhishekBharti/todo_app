@@ -45,7 +45,7 @@ class TaskHandler {
           'description': description,
           'favoriate': favoriate,
           'priority': 1,    // 0: Low, 1: Medium, 2: High
-          'status': 0,      // 0: Pending, 1: In Progress, 2: Completed
+          'status': 0,      // 0: In Progress, 1: Completed
           'task_id': taskId,
           'task_date': taskDate,  // Storing as DateTime, Firestore will store it as a Timestamp
           'title': title,
