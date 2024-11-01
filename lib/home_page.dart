@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_app/profile.dart';
 import 'new_list.dart';
@@ -17,6 +18,7 @@ class _HomePageState extends State<HomePage> {
   final taskHandler = TaskHandler();
   bool description_field_enabler = false;
   bool star_icon_enabler = false;
+  bool showCompletedTasks = false;
   String? selectedTask = "My Tasks"; // Variable to keep track of the selected task
 
   @override
@@ -211,14 +213,14 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.black87.withAlpha(180),
+                            color: Colors.black.withAlpha(120),
                             borderRadius: BorderRadius.circular(15),
                           ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: Column(
-                                children: [
-                                  Align(
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Align(
                                     alignment: Alignment.topLeft,
                                     child: Row(
                                       children: [
@@ -321,66 +323,189 @@ class _HomePageState extends State<HomePage> {
                                       ],
                                     ),
                                   ),
-                                  StreamBuilder<QuerySnapshot>(
-                                    stream: FirebaseFirestore.instance
-                                        .collection('users')
-                                        .doc(userEmail)
-                                        .collection(selectedTask ?? 'My Tasks')
-                                        .snapshots(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return Center(child: CircularProgressIndicator());
-                                      }
+                                ),
+                                StreamBuilder<QuerySnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(userEmail)
+                                      .collection(selectedTask ?? 'My Tasks')
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState == ConnectionState.waiting) {
+                                      return Center(child: CircularProgressIndicator());
+                                    }
 
-                                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                                        return Center(
-                                          child: Text(
-                                            'No tasks available',
-                                            style: TextStyle(color: Colors.white),
+                                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                                      return Center(
+                                        child: Text(
+                                          'No tasks available',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      );
+                                    }
+
+                                    final tasks = snapshot.data!.docs;
+                                    return Column(
+                                      children: tasks.map((task) {
+                                        return ListTile(
+                                          leading: IconButton(
+                                            onPressed: () {
+                                              // 0: Pending, 1: In Progress, 2: Completed
+                                              int newStatus = task['status'] == 2 ? 1 : 2;
+                                              FirebaseFirestore.instance
+                                                  .collection('users')
+                                                  .doc(userEmail)
+                                                  .collection(selectedTask ?? 'My Tasks')
+                                                  .doc(task.id) // Use the document ID to reference the task
+                                                  .update({'status': newStatus}).then((_) {
+                                                print("Task status updated successfully!");
+                                              }).catchError((error) {
+                                                print("Failed to update task status: $error");
+                                              });
+                                            },
+                                            icon: Icon(
+                                              task['status'] == 2
+                                                  ? Icons.check_circle
+                                                  : Icons.circle_outlined,
+                                              color: task['status'] == 2
+                                                  ? Colors.green
+                                                  : Colors.white,
+                                            ),
+                                          ),
+                                          title: Text(
+                                            task['title'],
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          subtitle: Text(
+                                            task['description'],
+                                            style: TextStyle(color: Colors.grey),
+                                          ),
+                                          trailing: IconButton(
+                                            onPressed: () async {
+                                              // Delete the specific task from Firebase
+                                              await FirebaseFirestore.instance
+                                                  .collection('users')
+                                                  .doc(userEmail)
+                                                  .collection(selectedTask ?? 'My Tasks')
+                                                  .doc(task.id) // Use the document ID to reference the task
+                                                  .delete()
+                                                  .then((_) {
+                                                print("Task successfully deleted!");
+                                              }).catchError((error) {
+                                                print("Failed to delete task: $error");
+                                              });
+                                            },
+                                              icon: Icon(Icons.delete, color: Colors.white.withAlpha(100)),
                                           ),
                                         );
-                                      }
-
-                                      final tasks = snapshot.data!.docs;
-                                      return Column(
-                                        children: tasks.map((task) {
-                                          return ListTile(
-                                            title: Text(
-                                              task['title'],
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            subtitle: Text(
-                                              task['description'],
-                                              style: TextStyle(color: Colors.grey),
-                                            ),
-                                            trailing: IconButton(
-                                              onPressed: () async {
-                                                // Delete the specific task from Firebase
-                                                await FirebaseFirestore.instance
-                                                    .collection('users')
-                                                    .doc(userEmail)
-                                                    .collection(selectedTask ?? 'My Tasks')
-                                                    .doc(task.id) // Use the document ID to reference the task
-                                                    .delete()
-                                                    .then((_) {
-                                                  print("Task successfully deleted!");
-                                                }).catchError((error) {
-                                                  print("Failed to delete task: $error");
-                                                });
-                                              },
-                                                icon: Icon(Icons.delete, color: Colors.white.withAlpha(100)),
-                                            ),
-                                          );
-                                        }).toList(),
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
+                                      }).toList(),
+                                    );
+                                  },
+                                ),
+                              ],
                             )
+                        ),
+                        SizedBox(height: 8),
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withAlpha(120),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(userEmail)
+                                .collection(selectedTask ?? 'My Tasks')
+                                .where('status', isEqualTo: 2) // Only completed tasks
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return Center(child: CircularProgressIndicator());
+                              }
+
+                              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                                // Don't show the container if there are no completed tasks
+                                return SizedBox.shrink();
+                              }
+
+                              final tasks = snapshot.data!.docs;
+
+                              return Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(20.0),
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            'Completed (${tasks.length})',
+                                            style: GoogleFonts.afacad(
+                                              textStyle: TextStyle(color: Colors.white, fontSize: 20.0),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Spacer(),
+                                      Padding(
+                                        padding: const EdgeInsets.only(right: 25.0),
+                                        child: IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              showCompletedTasks = !showCompletedTasks;
+                                            });
+                                          },
+                                          icon: Icon(
+                                            showCompletedTasks
+                                                ? Icons.keyboard_arrow_up_outlined
+                                                : Icons.keyboard_arrow_down_outlined,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  if (showCompletedTasks)
+                                    Column(
+                                      children: tasks.map((task) {
+                                        return ListTile(
+                                          leading: IconButton(
+                                            onPressed: () {
+                                              int newStatus = task['status'] == 2 ? 1 : 2;
+                                              FirebaseFirestore.instance
+                                                  .collection('users')
+                                                  .doc(userEmail)
+                                                  .collection(selectedTask ?? 'My Tasks')
+                                                  .doc(task.id)
+                                                  .update({'status': newStatus}).then((_) {
+                                                print("Task status updated successfully!");
+                                              }).catchError((error) {
+                                                print("Failed to update task status: $error");
+                                              });
+                                            },
+                                            icon: Icon(
+                                              Icons.check,
+                                              color: Colors.blue,
+                                            ),
+                                          ),
+                                          title: Text(
+                                            task['title'],
+                                            style: TextStyle(
+                                              color: Colors.white.withAlpha(150),
+                                              decoration: TextDecoration.lineThrough,
+                                              decorationColor: Colors.white.withAlpha(150),
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                ],
+                              );
+                            },
+                          ),
                         ),
                       ],
                     ),
