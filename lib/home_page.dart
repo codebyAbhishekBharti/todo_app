@@ -144,35 +144,38 @@ class _HomePageState extends State<HomePage> {
                                                 selectedTask = task; // Update selected task
                                               });
                                             },
-                                            child: Padding(
-                                              padding: EdgeInsets.only(left: 15, right: 15),
-                                              child: Column(
-                                                children: [
-                                                  Text(
-                                                    task.toString(),
-                                                    style: TextStyle(
-                                                      color: selectedTask == task
-                                                          ? Colors.blue
-                                                          : Colors.white,
-                                                      fontSize: 14.0,
-                                                      fontWeight: FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                  SizedBox(height: 12),
-                                                  // Conditionally render the Container only if the task is selected
-                                                  if (selectedTask == task)
-                                                    Container(
-                                                      width: 60,
-                                                      height: 3,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.blueAccent, // Blue color when selected
-                                                        borderRadius: BorderRadius.only(
-                                                          topLeft: Radius.circular(10),
-                                                          topRight: Radius.circular(10),
-                                                        ),
+                                            child: Container(
+                                              color: Colors.transparent,
+                                              child: Padding(
+                                                padding: EdgeInsets.only(left: 15, right: 15),
+                                                child: Column(
+                                                  children: [
+                                                    Text(
+                                                      task.toString(),
+                                                      style: TextStyle(
+                                                        color: selectedTask == task
+                                                            ? Colors.blue
+                                                            : Colors.white,
+                                                        fontSize: 14.0,
+                                                        fontWeight: FontWeight.w500,
                                                       ),
                                                     ),
-                                                ],
+                                                    SizedBox(height: 12),
+                                                    // Conditionally render the Container only if the task is selected
+                                                    if (selectedTask == task)
+                                                      Container(
+                                                        width: 60,
+                                                        height: 3,
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.blueAccent, // Blue color when selected
+                                                          borderRadius: BorderRadius.only(
+                                                            topLeft: Radius.circular(10),
+                                                            topRight: Radius.circular(10),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           );
@@ -188,13 +191,16 @@ class _HomePageState extends State<HomePage> {
                                       MaterialPageRoute(builder: (context) => NewList()),
                                     );
                                   },
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(bottom: 15.0, left: 15),
-                                    child: Text(
-                                      "+ New list",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14.0,
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(bottom: 15.0, left: 15),
+                                      child: Text(
+                                        "+ New list",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14.0,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -805,17 +811,18 @@ class _HomePageState extends State<HomePage> {
 
                               return Column(
                                 children: [
-                                  Row(
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            showCompletedTasks = !showCompletedTasks;
-                                          });
-                                        },
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(20.0),
-                                          child: Align(
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        showCompletedTasks = !showCompletedTasks;
+                                      });
+                                    },
+                                    child: Container(
+                                      color: Colors.transparent,  // Makes the entire row tappable, including empty spaces
+                                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                                      child: Row(
+                                        children: [
+                                          Align(
                                             alignment: Alignment.centerLeft,
                                             child: Text(
                                               'Completed (${tasks.length})',
@@ -824,26 +831,19 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           ),
-                                        ),
-                                      ),
-                                      Spacer(),
-                                      Padding(
-                                        padding: const EdgeInsets.only(right: 25.0),
-                                        child: IconButton(
-                                          onPressed: () {
-                                            // setState(() {
-                                            //   showCompletedTasks = !showCompletedTasks;
-                                            // });
-                                          },
-                                          icon: Icon(
-                                            showCompletedTasks
-                                                ? Icons.keyboard_arrow_up_outlined
-                                                : Icons.keyboard_arrow_down_outlined,
-                                            color: Colors.white,
+                                          Spacer(),
+                                          Padding(
+                                            padding: const EdgeInsets.only(right: 5.0),
+                                            child: Icon(
+                                              showCompletedTasks
+                                                  ? Icons.keyboard_arrow_up_outlined
+                                                  : Icons.keyboard_arrow_down_outlined,
+                                              color: Colors.white,
+                                            ),
                                           ),
-                                        ),
+                                        ],
                                       ),
-                                    ],
+                                    ),
                                   ),
                                   if (showCompletedTasks)
                                     Column(
@@ -884,6 +884,7 @@ class _HomePageState extends State<HomePage> {
                             },
                           ),
                         ),
+                        SizedBox(height: 80),
                       ],
                     ),
                   ),
