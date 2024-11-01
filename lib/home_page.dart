@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_app/profile.dart';
@@ -327,6 +328,48 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ],
                                     ),
+                                  ),
+                                ),
+                                // no task found
+                                Container(
+                                  child: StreamBuilder<QuerySnapshot>(
+                                    stream: FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(userEmail)
+                                        .collection(selectedTask ?? 'My Tasks')
+                                        .snapshots(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        return Center(child: CircularProgressIndicator());
+                                      }
+
+                                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(top: 8.0,left: 50,right: 50,bottom: 50),
+                                          child: Column(
+                                            children: [
+                                              // Image.asset('assets/images/empty-tasks-light.svg'),
+                                              // Image.asset('assets/images/app_logo.png'),
+                                              SvgPicture.asset(
+                                                'assets/images/empty-tasks-light.svg',
+                                                width: 250.0,       // Set the width as needed
+                                                height: 250.0,      // Set the height as needed
+                                                fit: BoxFit.cover,  // Control how it fits
+                                              ),
+                                              Center(child: Text("No tasks yet", style: TextStyle(fontSize: 20,color: Colors.white.withAlpha(180)))),
+                                              Center(
+                                                  child: Text(
+                                                    "Add your to-dos and keep\n track of them across Google \nWorkspace",
+                                                    style: TextStyle(fontSize:16,color: Colors.white.withAlpha(180)),
+                                                    textAlign: TextAlign.center,
+                                                    )
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                      return Text("");
+                                    },
                                   ),
                                 ),
                                 // past container
