@@ -340,7 +340,8 @@ class _HomePageState extends State<HomePage> {
                                         .snapshots(),
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return Center(child: CircularProgressIndicator());
+                                        print("Waiting for data...");
+                                      //   return Center(child: CircularProgressIndicator());
                                       }
 
                                       if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -424,7 +425,8 @@ class _HomePageState extends State<HomePage> {
                                         .snapshots(),
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return Center(child: CircularProgressIndicator());
+                                        // return Center(child: CircularProgressIndicator());
+                                        print("Waiting for data...");
                                       }
 
                                       if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -513,7 +515,8 @@ class _HomePageState extends State<HomePage> {
                                         .snapshots(),
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return Center(child: CircularProgressIndicator());
+                                        // return Center(child: CircularProgressIndicator());
+                                        print("Waiting for data...");
                                       }
 
                                       if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -601,7 +604,8 @@ class _HomePageState extends State<HomePage> {
                                         .snapshots(),
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return Center(child: CircularProgressIndicator());
+                                        // return Center(child: CircularProgressIndicator());
+                                        print("Waiting for data...");
                                       }
 
                                       if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -788,7 +792,8 @@ class _HomePageState extends State<HomePage> {
                                 .snapshots(),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
-                                return Center(child: CircularProgressIndicator());
+                                // return Center(child: CircularProgressIndicator());
+                                print("Waiting for data...");
                               }
 
                               if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
