@@ -12,13 +12,38 @@ class TaskHandler {
       await userDoc.update({
         'tasks': FieldValue.arrayRemove([taskName]),
       });
-      print('Task deleted successfully');
+      if (taskName != null) {
+        CollectionReference taskSubcollection = userDoc.collection(taskName);
+        await deleteCollectionInBatch(taskSubcollection);
+      }
+
+      print('Task and associated subcollections deleted successfully');
       return true;
     } catch (e) {
       print('Error deleting task: $e');
       return false;
     }
   }
+
+// Helper function to delete a collection in batches
+  Future<void> deleteCollectionInBatch(CollectionReference collectionRef) async {
+    const int batchSize = 100; // Firestore batch limit
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+
+    // Retrieve all documents in the collection in one go (up to batchSize limit)
+    QuerySnapshot snapshots = await collectionRef.limit(batchSize).get();
+    for (var doc in snapshots.docs) {
+      batch.delete(doc.reference);
+    }
+
+    // Commit batch if there are documents to delete
+    if (snapshots.docs.isNotEmpty) {
+      await batch.commit();
+      // Recursively delete the next batch
+      await deleteCollectionInBatch(collectionRef);
+    }
+  }
+
 
   void getTasks() async{
     // Get the user document reference
