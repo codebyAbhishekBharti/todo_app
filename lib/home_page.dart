@@ -430,6 +430,7 @@ class _HomePageState extends State<HomePage> {
                                       .collection(selectedTask ?? 'My Tasks')
                                       .where('status', isEqualTo: 0)
                                       .where('task_date', isLessThanOrEqualTo: Timestamp.fromDate(DateTime.now().subtract(Duration(hours: 24))))
+                                      .where('task_date', isNotEqualTo: Timestamp.fromDate(specificDateTime))
                                       .snapshots(),
                                 ),
                                 // today container
