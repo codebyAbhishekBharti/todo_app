@@ -25,7 +25,7 @@ class _LoginPage extends State<LoginPage> {
     passText.dispose();
   }
 
-  void _signIn() async {
+  Future<bool> _signIn() async {
     String email = emailText.text;
     String pass = passText.text;
 
@@ -39,8 +39,10 @@ class _LoginPage extends State<LoginPage> {
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
       );
+      return true;
     } else {
       print("Some error happened");
+      return false;
     }
   }
 
@@ -113,10 +115,19 @@ class _LoginPage extends State<LoginPage> {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   print('Email: ${emailText.text}');
                   print('Password: ${passText.text}');
-                  _signIn();
+                  if(await _signIn() == false){
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Either email or password is incorrect")),
+                      );
+                  }
+                  else{
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Login Successful")),
+                      );
+                  }
                 },
                 child: const Text('Login'),
               ),

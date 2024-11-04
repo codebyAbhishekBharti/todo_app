@@ -26,7 +26,7 @@ class _SignupState extends State<Signup_page> {
     passText.dispose();
   }
 
-  void _signup() async {
+  Future<bool> _signup() async {
     String name = nameText.text;
     String email = emailText.text;
     String pass = passText.text;
@@ -38,8 +38,10 @@ class _SignupState extends State<Signup_page> {
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
       );
+      return true;
     } else {
       print("Some error happened");
+      return false;
     }
   }
 
@@ -99,7 +101,18 @@ class _SignupState extends State<Signup_page> {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _signup,
+                onPressed: () async {
+                  if(await _signup() == false){
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Enter valid email and password min 6 characters")),
+                    );
+                  }
+                  else{
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Signup Successful")),
+                    );
+                  }
+                },
                 child: const Text('SignUp'),
               ),
               ElevatedButton(
