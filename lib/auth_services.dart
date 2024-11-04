@@ -1,4 +1,5 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirebaseAuthService{
@@ -6,6 +7,10 @@ class FirebaseAuthService{
   Future<User?> signUpWithEmailAndPassword(String email, String pass) async{
     try{
       UserCredential credential = await _auth.createUserWithEmailAndPassword(email: email, password: pass);
+      DocumentReference userDoc = FirebaseFirestore.instance.collection('users').doc(email);
+      await userDoc.set({
+        'tasks': ["My Tasks"]
+      });
       return credential.user;
     }
     catch(e){
