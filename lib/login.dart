@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -59,6 +60,10 @@ class _LoginPage extends State<LoginPage> {
       print("User: $user");
       var sharedPref = await SharedPreferences.getInstance();
       if (user != null) {
+        DocumentReference userDoc = FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.email);
+        await userDoc.set({
+          'tasks': ["My Tasks"]
+        });
         print("User is created");
         sharedPref.setBool('login', true);
         Navigator.push(
