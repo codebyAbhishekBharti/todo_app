@@ -87,4 +87,19 @@ class TaskHandler {
     else return false;
   }
 
+  Future<bool> delete_completed_task(String taskName) async {
+    try {
+      CollectionReference userDoc = _firestore.collection('users').doc(userEmail).collection(taskName);
+      QuerySnapshot querySnapshot = await userDoc.where('status', isEqualTo: 1).get();
+      for (var doc in querySnapshot.docs) {
+        await doc.reference.delete();
+      }
+      print('deleted all completed tasks');
+      return true;
+    } catch (e) {
+      print('Error deleting task: $e');
+      return false;
+    }
+  }
+
 }

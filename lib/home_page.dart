@@ -1,3 +1,5 @@
+// import 'dart:js_interop';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -327,9 +329,15 @@ class _HomePageState extends State<HomePage> {
                                                           'Delete all completed tasks',
                                                           style: TextStyle(color: Colors.white),
                                                         ),
-                                                        onTap: () {
+                                                        onTap: () async {
                                                           // Handle delete completed tasks action
-                                                          Navigator.pop(context); // Close the bottom sheet
+                                                          bool deleted = await taskHandler.delete_completed_task(selectedTask!);
+                                                          if (deleted) {
+                                                            print("All completed tasks deleted successfully");
+                                                            Navigator.pop(context);
+                                                          } else {
+                                                            print("Error deleting completed tasks");
+                                                          }
                                                         },
                                                       ),
                                                     ],
@@ -761,4 +769,18 @@ class _HomePageState extends State<HomePage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
+  // Future<bool> delete_completed_task(String taskName) async {
+  //   try {
+  //     CollectionReference userDoc = FirebaseFirestore.instance.collection('users').doc(userEmail).collection(taskName);
+  //     QuerySnapshot querySnapshot = await userDoc.where('status', isEqualTo: 1).get();
+  //     for (var doc in querySnapshot.docs) {
+  //       await doc.reference.delete();
+  //     }
+  //     print('deleted all completed tasks');
+  //     return true;
+  //   } catch (e) {
+  //     print('Error deleting task: $e');
+  //     return false;
+  //   }
+  // }
 }
