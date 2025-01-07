@@ -81,78 +81,139 @@ class _LoginPage extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(
+      //   backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      //   title: Text('Flutter Demo Home Page'),
+      //
+      // ),
+      // body: Container(
+      //   color: Colors.grey[900],
+      //   child: Center(
+      //     child: Container(
+      //       width: 300,
+      //       child: Column(
+      //         mainAxisAlignment: MainAxisAlignment.center,
+      //         children: [
+      //           TextField(
+      //             controller: emailText,
+      //             decoration: InputDecoration(
+      //               border: OutlineInputBorder(
+      //                 borderRadius: BorderRadius.circular(12),
+      //                 borderSide: const BorderSide(
+      //                   color: Colors.red,
+      //                   width: 2,
+      //                 ),
+      //               ),
+      //               labelText: 'Enter your username',
+      //             ),
+      //           ),
+      //           SizedBox(height: 20),
+      //           TextField(
+      //             controller: passText,
+      //             decoration: InputDecoration(
+      //               border: OutlineInputBorder(
+      //                 borderRadius: BorderRadius.circular(12),
+      //                 borderSide: const BorderSide(
+      //                   color: Colors.red,
+      //                   width: 2,
+      //                 ),
+      //               ),
+      //               labelText: 'Enter your password',
+      //             ),
+      //           ),
+      //           SizedBox(height: 20),
+      //           ElevatedButton(
+      //             onPressed: () async {
+      //               print('Email: ${emailText.text}');
+      //               print('Password: ${passText.text}');
+      //               if(await _signIn() == false){
+      //                 ScaffoldMessenger.of(context).showSnackBar(
+      //                   SnackBar(content: Text("Either email or password is incorrect")),
+      //                   );
+      //               }
+      //               else{
+      //                 ScaffoldMessenger.of(context).showSnackBar(
+      //                   SnackBar(content: Text("Login Successful")),
+      //                   );
+      //               }
+      //             },
+      //             child: const Text('Login'),
+      //           ),
+      //           ElevatedButton(
+      //             onPressed: () {
+      //               print("Google SignIn");
+      //               signInWithGoogle();
+      //             },
+      //             child: Text("Google SignIn"),
+      //           ),
+      //           ElevatedButton(
+      //             onPressed: () {
+      //               Navigator.push(
+      //                 context,
+      //                 MaterialPageRoute(builder: (context) => Signup_page()),
+      //               );
+      //             },
+      //             child: Text("SignUp"),
+      //           ),
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      // ),
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text('Flutter Demo Home Page'),
+        backgroundColor: Colors.grey[900],
+        title: Text(''),
       ),
       body: Center(
         child: Container(
-          width: 300,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextField(
-                controller: emailText,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: Colors.red,
-                      width: 2,
+          color: Colors.grey[900],
+          height: MediaQuery.of(context).size.height,
+          child: Center(
+            child: Container(
+              width: MediaQuery.of(context).size.width*0.8,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/images/login_page_icon.png',
+                    width: MediaQuery.of(context).size.width * 0.6,
+                  ),
+                  SizedBox(height: 20),
+                  Text("Welcome to Tasks",
+                  style: TextStyle(
+                    fontSize: 23,
+                    color: Colors.white,
                     ),
                   ),
-                  labelText: 'Enter your username',
-                ),
-              ),
-              SizedBox(height: 20),
-              TextField(
-                controller: passText,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: Colors.red,
-                      width: 2,
+                  SizedBox(height: 20),
+                  Text("Keep track of important things that you need to get done in one place",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.white,
                     ),
                   ),
-                  labelText: 'Enter your password',
-                ),
+                  SizedBox(height: 30),
+                  ElevatedButton(
+                    onPressed: () {
+                      // print("login button is pressed");
+                      print("Google SignIn");
+                      signInWithGoogle();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue.withAlpha(100),
+                    ),
+                    child: Text('Get Started',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                    ),
+                  ),
+                  SizedBox(height: 90),
+                ],
               ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  print('Email: ${emailText.text}');
-                  print('Password: ${passText.text}');
-                  if(await _signIn() == false){
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Either email or password is incorrect")),
-                      );
-                  }
-                  else{
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Login Successful")),
-                      );
-                  }
-                },
-                child: const Text('Login'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  print("Google SignIn");
-                  signInWithGoogle();
-                },
-                child: Text("Google SignIn"),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Signup_page()),
-                  );
-                },
-                child: Text("SignUp"),
-              ),
-            ],
+            ),
           ),
         ),
       ),
