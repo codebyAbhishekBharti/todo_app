@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_app/profile.dart';
 import 'Widgets/task_tile_viewer.dart';
+import 'create_rename_page.dart';
 import 'new_list.dart';
 import 'package:todo_app/controller/task_handler.dart';
 class HomePage extends StatefulWidget {
@@ -197,7 +198,20 @@ class _HomePageState extends State<HomePage> {
                                   onTap: () {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => NewList()),
+                                      MaterialPageRoute(
+                                        builder: (context) => TaskListPage(
+                                          title: "Create new list",
+                                          initialText: "", // Replace with the actual current name
+                                          doneButtonColor: Colors.grey,
+                                          onDone: (updatedListName) {
+                                            // Handle the logic for renaming the list
+                                              setState(() {
+                                                selectedTask=updatedListName;
+                                              });
+                                            print("Renamed to: $updatedListName");
+                                          },
+                                        ),
+                                      ),
                                     );
                                   },
                                   child: Container(
@@ -285,8 +299,29 @@ class _HomePageState extends State<HomePage> {
                                                           style: TextStyle(color: Colors.white),
                                                         ),
                                                         onTap: () {
-                                                          // Handle rename list action
-                                                          Navigator.pop(context); // Close the bottom sheet
+                                                          // Close the bottom sheet first
+                                                          print(selectedTask);
+
+                                                          Navigator.pop(context);
+
+                                                          // Then navigate to the TaskListPage
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) => TaskListPage(
+                                                                title: "Rename List",
+                                                                initialText: selectedTask!, // Replace with the actual current name
+                                                                doneButtonColor: Colors.blueAccent.withAlpha(250),
+                                                                onDone: (updatedListName) {
+                                                                  // Handle the logic for renaming the list
+                                                                  setState(() {
+                                                                    selectedTask=updatedListName;
+                                                                  });
+                                                                  print("Renamed to: $updatedListName");
+                                                                },
+                                                              ),
+                                                            ),
+                                                          );
                                                         },
                                                       ),
                                                       ListTile(
