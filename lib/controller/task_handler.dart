@@ -102,4 +102,74 @@ class TaskHandler {
     }
   }
 
+  Future<void> renameCollection({
+    required String oldCollectionName,
+    required String newCollectionName,
+  }) async {
+    final userDoc = _firestore.collection('users').doc(userEmail);
+
+    try {
+      // Reference to the old and new collections
+      final oldCollectionRef = userDoc.collection(oldCollectionName);
+      final newCollectionRef = userDoc.collection(newCollectionName);
+      await userDoc.update({
+        'tasks': FieldValue.arrayRemove([oldCollectionName]),
+      });
+      await userDoc.update({
+        'tasks': FieldValue.arrayUnion([newCollectionName]),
+      });
+
+      // Fetch all documents from the old collection
+      final QuerySnapshot querySnapshot = await oldCollectionRef.get();
+
+      // Copy each document to the new collection
+      for (final QueryDocumentSnapshot doc in querySnapshot.docs) {
+        final newDocRef = newCollectionRef.doc(doc.id);
+        // Cast doc.data() to Map<String, dynamic>
+        await newDocRef.set(doc.data() as Map<String, dynamic>);
+      }
+
+      // After copying, delete documents from the old collection
+      for (final QueryDocumentSnapshot doc in querySnapshot.docs) {
+        await doc.reference.delete();
+      }
+
+      print("Collection renamed from '$oldCollectionName' to '$newCollectionName'");
+    } catch (e) {
+      print("Error renaming collection: $e");
+      rethrow; // Optional: rethrow the error to handle it higher up
+    }
+  }
+
+  Future<bool> saveTask({
+    required String titleText,
+  }) async {
+    final userDoc = FirebaseFirestore.instance.collection('users').doc(userEmail);
+    if (titleText.isNotEmpty) {
+      try {
+        // Check if the document exists
+        DocumentSnapshot docSnapshot = await userDoc.get();
+        if (docSnapshot.exists) {
+          // Update the tasks array by adding the new task
+          await userDoc.update({
+            'tasks': FieldValue.arrayUnion([titleText])
+          });
+          print("Task added successfully");
+        } else {
+          // If the document does not exist, you might want to create it and add the task
+          await userDoc.set({
+            'tasks': [titleText]
+          });
+          print("User document created and task added");
+        }
+        return true;
+      } catch (e) {
+        print("Error adding task: $e");
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
 }

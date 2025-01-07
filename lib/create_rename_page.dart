@@ -2,49 +2,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'controller/task_handler.dart';
 
 class TaskListPage extends StatelessWidget {
   final String title; // Page title
   final String initialText; // Initial text for the text field
   final Function(String) onDone; // Callback for when "Done" is clicked
   final Color doneButtonColor; // Color of the "Done" button
+  final String selectedTask; // The selected task
   var titleText = TextEditingController();
+  TaskHandler _taskHandler = new TaskHandler();
   TaskListPage({
     required this.title,
     required this.initialText,
     required this.onDone,
     required this.doneButtonColor,
+    required this.selectedTask,
   }) {
     titleText = TextEditingController(text: initialText);
   }
   final String userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
-
-  void saveTask() async {
-    // Get the user document reference
-    final userDoc = FirebaseFirestore.instance.collection('users').doc(
-        userEmail);
-    if (titleText.text.isNotEmpty) {
-      try {
-        // Check if the document exists
-        DocumentSnapshot docSnapshot = await userDoc.get();
-        if (docSnapshot.exists) {
-          // Update the tasks array by adding the new task
-          await userDoc.update({
-            'tasks': FieldValue.arrayUnion([titleText.text])
-          });
-          print("Task added successfully");
-        } else {
-          // If the document does not exist, you might want to create it and add the task
-          await userDoc.set({
-            'tasks': [titleText.text]
-          });
-          print("User document created and task added");
-        }
-      } catch (e) {
-        print("Error adding task: $e");
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +42,16 @@ class TaskListPage extends StatelessWidget {
           TextButton(
             onPressed: () {
               if(titleText.text.trim().isNotEmpty){
-                saveTask();
+                switch (title) {
+                  case 'Create new list':
+                    _taskHandler.saveTask(titleText: titleText.text);
+                    break;
+                  case 'Rename List':
+                    _taskHandler.renameCollection(oldCollectionName: selectedTask, newCollectionName: titleText.text);
+                    break;
+                  default:
+                    break;
+                }
                 onDone(titleText.text);
                 Navigator.pop(context, "done");
               }

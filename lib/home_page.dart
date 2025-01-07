@@ -203,6 +203,7 @@ class _HomePageState extends State<HomePage> {
                                           title: "Create new list",
                                           initialText: "", // Replace with the actual current name
                                           doneButtonColor: Colors.grey,
+                                          selectedTask: selectedTask!,
                                           onDone: (updatedListName) {
                                             // Handle the logic for renaming the list
                                               setState(() {
@@ -312,6 +313,7 @@ class _HomePageState extends State<HomePage> {
                                                                 title: "Rename List",
                                                                 initialText: selectedTask!, // Replace with the actual current name
                                                                 doneButtonColor: Colors.blueAccent.withAlpha(250),
+                                                                selectedTask: selectedTask!,
                                                                 onDone: (updatedListName) {
                                                                   // Handle the logic for renaming the list
                                                                   setState(() {
