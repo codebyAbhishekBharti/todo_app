@@ -177,7 +177,7 @@ class _LoginPage extends State<LoginPage> {
                 children: [
                   Image.asset(
                     'assets/images/login_page_icon.png',
-                    width: MediaQuery.of(context).size.width * 0.6,
+                    // width: MediaQuery.of(context).size.width * 0.6,
                   ),
                   SizedBox(height: 20),
                   Text("Welcome to Tasks",

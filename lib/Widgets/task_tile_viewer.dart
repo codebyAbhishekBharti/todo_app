@@ -72,7 +72,8 @@ Widget taskContainer({
                         ),
                       ),
                       title: Text(task['title'], style: TextStyle(color: Colors.white)),
-                      subtitle: Text(task['description'], style: TextStyle(color: Colors.grey)),
+                      subtitle: task['description'] != null && task['description'].isNotEmpty
+                          ? Text(task['description'],style: TextStyle(color: Colors.grey),) : null,
                       trailing: IconButton(
                         onPressed: () async {
                           await FirebaseFirestore.instance
