@@ -34,7 +34,7 @@ class TaskListPage extends StatelessWidget {
             color: Color.fromARGB(200, 255, 255, 255), // Set the color to white
           ),
           onPressed: () {
-            onDone(titleText.text);
+            onDone(selectedTask);
             Navigator.pop(context, "done");
           },
         ),
