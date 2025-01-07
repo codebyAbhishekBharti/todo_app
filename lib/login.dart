@@ -62,8 +62,8 @@ class _LoginPage extends State<LoginPage> {
       if (user != null) {
         DocumentReference userDoc = FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.email);
         await userDoc.set({
-          'tasks': ["My Tasks"]
-        });
+          'tasks': FieldValue.arrayUnion(["My Tasks"])
+        }, SetOptions(merge: true));
         print("User is created");
         sharedPref.setBool('login', true);
         Navigator.push(
@@ -163,6 +163,8 @@ class _LoginPage extends State<LoginPage> {
       appBar: AppBar(
         backgroundColor: Colors.grey[900],
         title: Text(''),
+        // backgroundColor: Colors.white,
+        automaticallyImplyLeading: false, // Removes the back arrow
       ),
       body: Center(
         child: Container(

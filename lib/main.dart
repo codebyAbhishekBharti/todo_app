@@ -88,6 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Colors.grey[900],
         title: Text(''),
+        automaticallyImplyLeading: false, // Removes the back arrow
       ),
       body: Container(
         width: double.infinity,
