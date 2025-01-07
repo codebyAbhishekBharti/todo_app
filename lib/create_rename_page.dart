@@ -40,14 +40,27 @@ class TaskListPage extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () {
+            onPressed: () async{
               if(titleText.text.trim().isNotEmpty){
                 switch (title) {
                   case 'Create new list':
                     _taskHandler.saveTask(titleText: titleText.text);
                     break;
                   case 'Rename List':
-                    _taskHandler.renameCollection(oldCollectionName: selectedTask, newCollectionName: titleText.text);
+                    bool success = await _taskHandler.renameCollection(oldCollectionName: selectedTask, newCollectionName: titleText.text);
+                    if(success){
+                      print("Collection renamed successfully");
+                    }else{
+                      print("Error renaming collection");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Task list name already exists'),
+                          duration: Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                        ),
+                      );
+                    }
                     break;
                   default:
                     break;

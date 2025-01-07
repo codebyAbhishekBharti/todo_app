@@ -102,11 +102,20 @@ class TaskHandler {
     }
   }
 
-  Future<void> renameCollection({
+  Future<bool> renameCollection({
     required String oldCollectionName,
     required String newCollectionName,
   }) async {
     final userDoc = _firestore.collection('users').doc(userEmail);
+    final userSnapshot = await userDoc.get();
+
+    // Check if the 'tasks' field already contains the new collection name
+    final List<dynamic> existingTasks = userSnapshot.data()?['tasks'] ?? [];
+    if (existingTasks.contains(newCollectionName)) {
+      print("The task list name '$newCollectionName' already exists.");
+      return false;
+    }
+
 
     try {
       // Reference to the old and new collections
@@ -135,8 +144,10 @@ class TaskHandler {
       }
 
       print("Collection renamed from '$oldCollectionName' to '$newCollectionName'");
+      return true;
     } catch (e) {
       print("Error renaming collection: $e");
+      return false;
       rethrow; // Optional: rethrow the error to handle it higher up
     }
   }
