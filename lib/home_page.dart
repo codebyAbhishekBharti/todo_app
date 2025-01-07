@@ -48,7 +48,13 @@ class _HomePageState extends State<HomePage> {
                 child: IconButton(
                   icon: ClipRRect(
                     borderRadius: BorderRadius.circular(25),
-                    child: Image.asset(
+                    child: FirebaseAuth.instance.currentUser?.photoURL != null
+                        ? Image.network(
+                      FirebaseAuth.instance.currentUser!.photoURL!,
+                      width: 35,
+                      height: 35,
+                    )
+                        : Image.asset(
                       'assets/images/profile_image.png',
                       width: 35,
                       height: 35,
