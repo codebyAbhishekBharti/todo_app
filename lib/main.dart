@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_app/firebase_testing.dart';
 import 'package:todo_app/login.dart';
@@ -84,18 +86,45 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        backgroundColor: Colors.grey[900],
+        title: Text(''),
       ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => LoginPage()),
-            );
-          },
-          child: const Text('Go to Login Page'),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: Colors.grey[900],
+        child: Center(
+          child: Container(
+            // width: MediaQuery.of(context).size.width * 0.8,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: 100),
+                SvgPicture.asset(
+                  'assets/images/logo_tasks_2021_64dp.svg', // Path to your SVG asset
+                  width: 150, // Set the width of the SVG image
+                  height: 150, // Set the height of the SVG image
+                ),
+                SizedBox(height: 300),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Google",
+                      style: GoogleFonts.afacad(
+                        textStyle: TextStyle(color: Colors.white,fontSize: 40.0,fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                    Text("Workspace",
+                      style: GoogleFonts.afacad(
+                        textStyle: TextStyle(color: Colors.white,fontSize: 40.0),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
