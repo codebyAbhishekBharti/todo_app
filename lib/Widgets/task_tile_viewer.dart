@@ -15,45 +15,55 @@ Widget taskContainer({
       stream: stream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          print("Waiting for data...");
+          return Center(child: CircularProgressIndicator());
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return SizedBox.shrink();
         }
 
         final tasks = snapshot.data!.docs;
+
+        // Group tasks by date
+        final Map<String, List<QueryDocumentSnapshot>> groupedTasks = {};
+        for (final task in tasks) {
+          final DateTime dateTime = (task['task_date'] as Timestamp).toDate();
+          final String dateKey = DateFormat('EEE, d MMM').format(dateTime);
+
+          if (groupedTasks.containsKey(dateKey)) {
+            groupedTasks[dateKey]!.add(task);
+          } else {
+            groupedTasks[dateKey] = [task];
+          }
+        }
+
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if(showDateHeader==false)
-            Padding(
-              padding: const EdgeInsets.only(left: 30.0),
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: Text(label, style: TextStyle(color: labelColor)),
+            if (!showDateHeader)
+              Padding(
+                padding: const EdgeInsets.only(left: 30.0),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text(label, style: TextStyle(color: labelColor)),
+                ),
               ),
-            ),
-            Column(
-              children: tasks.map((task) {
-                String? formattedDate;
+            ...groupedTasks.entries.map((entry) {
+              final String dateHeader = entry.key;
+              final List<QueryDocumentSnapshot> dateTasks = entry.value;
 
-                // Display date header if enabled
-                if (showDateHeader) {
-                  DateTime dateTime = (task['task_date'] as Timestamp).toDate();
-                  formattedDate = DateFormat('EEE, d MMM').format(dateTime);
-                }
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (showDateHeader && formattedDate != null)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 30.0),
-                        child: Text(
-                          formattedDate,
-                          style: TextStyle(color: Colors.white),
-                        ),
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (showDateHeader)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 30.0, top: 10.0),
+                      child: Text(
+                        dateHeader,
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       ),
-                    ListTile(
+                    ),
+                  ...dateTasks.map((task) {
+                    return ListTile(
                       leading: IconButton(
                         onPressed: () {
                           int newStatus = task['status'] == 0 ? 1 : 0;
@@ -73,7 +83,8 @@ Widget taskContainer({
                       ),
                       title: Text(task['title'], style: TextStyle(color: Colors.white)),
                       subtitle: task['description'] != null && task['description'].isNotEmpty
-                          ? Text(task['description'],style: TextStyle(color: Colors.grey),) : null,
+                          ? Text(task['description'], style: TextStyle(color: Colors.grey))
+                          : null,
                       trailing: IconButton(
                         onPressed: () async {
                           await FirebaseFirestore.instance
@@ -87,11 +98,11 @@ Widget taskContainer({
                         },
                         icon: Icon(Icons.delete, color: Colors.white.withAlpha(100)),
                       ),
-                    ),
-                  ],
-                );
-              }).toList(),
-            ),
+                    );
+                  }).toList(),
+                ],
+              );
+            }).toList(),
           ],
         );
       },
