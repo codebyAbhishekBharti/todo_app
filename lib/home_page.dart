@@ -337,13 +337,14 @@ class _HomePageState extends State<HomePage> {
                                                           style: (selectedTask=="My Tasks")?TextStyle(color: Colors.white.withAlpha(100),fontSize: 12):TextStyle(color: Colors.white,fontSize: 12),
                                                         ):null,
                                                         onTap: () async {
+                                                          Navigator.pop(context);
                                                           // Handle delete list action
                                                           if (selectedTask != "My Tasks") {
                                                             if(await taskHandler.deleteTask(selectedTask)){
                                                               setState(() {
                                                                 selectedTask="My Tasks";
                                                               });
-                                                              Navigator.pop(context);
+
                                                               print("Task deleted successfully main");
 
                                                               ScaffoldMessenger.of(context).showSnackBar(
@@ -367,11 +368,11 @@ class _HomePageState extends State<HomePage> {
                                                           style: TextStyle(color: Colors.white),
                                                         ),
                                                         onTap: () async {
+                                                          Navigator.pop(context);
                                                           // Handle delete completed tasks action
                                                           bool deleted = await taskHandler.delete_completed_task(selectedTask!);
                                                           if (deleted) {
                                                             print("All completed tasks deleted successfully");
-                                                            Navigator.pop(context);
                                                           } else {
                                                             print("Error deleting completed tasks");
                                                           }
@@ -480,7 +481,7 @@ class _HomePageState extends State<HomePage> {
                                       .doc(userEmail)
                                       .collection(selectedTask ?? 'My Tasks')
                                       .where('status', isEqualTo: 0)
-                                      .where('task_date', isLessThanOrEqualTo: Timestamp.fromDate(DateTime.now().subtract(Duration(hours: 24))))
+                                      .where('task_date',isLessThan: Timestamp.fromDate(DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),),)
                                       .where('task_date', isNotEqualTo: Timestamp.fromDate(specificDateTime))
                                       .snapshots(),
                                 ),
@@ -494,9 +495,9 @@ class _HomePageState extends State<HomePage> {
                                       .collection('users')
                                       .doc(userEmail)
                                       .collection(selectedTask ?? 'My Tasks')
-                                      .where('task_date', isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime.now().subtract(Duration(hours: 24))), // Start of today
-                                      isLessThan: Timestamp.fromDate(DateTime.now().add(Duration(days: 1)))) // End of today
-                                      .where('status',isEqualTo: 0)
+                                      .where('task_date',isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),),)
+                                      .where('task_date',isLessThan: Timestamp.fromDate(DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day).add(Duration(days: 1)),),)
+                                      .where('status', isEqualTo: 0)
                                       .snapshots(),
                                 ),
                                 // future container
@@ -509,7 +510,7 @@ class _HomePageState extends State<HomePage> {
                                         .collection('users')
                                         .doc(userEmail)
                                         .collection(selectedTask ?? 'My Tasks')
-                                        .where('task_date', isGreaterThan: Timestamp.fromDate(DateTime.now().add(Duration(days: 1)))) // End of today
+                                        .where('task_date',isGreaterThan: Timestamp.fromDate(DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),),)
                                         .where('status', isEqualTo: 0)
                                         .snapshots(),
                                   showDateHeader: true
@@ -765,6 +766,7 @@ class _HomePageState extends State<HomePage> {
                               Spacer(), // This will push the following Done to the right
                               GestureDetector(
                                 onTap: () async{
+                                  Navigator.pop(context);
                                   print(ttitle.text);
                                   print(description.text);
                                   print(favoriate);
@@ -775,7 +777,6 @@ class _HomePageState extends State<HomePage> {
                                       star_icon_enabler = false;
                                       description_field_enabler = false;
                                     });
-                                    Navigator.pop(context);
                                   }
                                   else{
                                     print("Error adding task");
